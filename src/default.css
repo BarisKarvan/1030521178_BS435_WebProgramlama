@@ -1,0 +1,84 @@
+/* src/default.css */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #f8fafc;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.btn-main {
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  border: none;
+  color: white;
+  width: 280px;
+  transition: transform 0.2s;
+}
+
+.btn-main:hover { transform: scale(1.03); }
+.classic-btn { background-color: #4f46e5; }
+.hangman-btn { background-color: #10b981; }
+.shooter-btn { background-color: #f43f5e; }
+
+.back-link {
+  color: #6366f1;
+  cursor: pointer;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.status-box {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.img-grid {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.game-img {
+  width: 220px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.game-img:hover { border-color: #6366f1; }
