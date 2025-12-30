@@ -1,83 +1,82 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const ShootGame = ({ data }) => {
+const ShootGame = ({ data, username, onFinish }) => {
   const [target, setTarget] = useState(null);
-  const [score, setScore] = useState(0);
+  const [stats, setStats] = useState({ correct: 0, wrong: 0 });
+  const [lives, setLives] = useState(3);
+  const isSaving = useRef(false);
 
-  // Veri gelmezse hata vermesini önle
-  if (!data || data.length === 0) return <div>Veri yükleniyor...</div>;
+  const saveAndExit = (finalCorrect) => {
+    if (isSaving.current) return;
+    isSaving.current = true;
+
+    fetch('http://localhost:5000/api/save-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        username, 
+        score: finalCorrect * 10, 
+        mode: 'SHOOTER', 
+        details: `Vurulan AI: ${finalCorrect}` 
+      })
+    })
+    .then(() => onFinish())
+    .catch(err => console.error("Skor kaydedilemedi:", err));
+  };
 
   useEffect(() => {
-    // 1.2 saniyede bir yeni hedef belirle
-    const interval = setInterval(() => {
-      const randomImg = data[Math.floor(Math.random() * data.length)];
-      
-      // Rastgele konum belirle (Ekranın dışına taşmaması için sınırlar koyduk)
-      setTarget({
-        ...randomImg,
-        top: Math.floor(Math.random() * 60 + 10) + "%", 
-        left: Math.floor(Math.random() * 70 + 10) + "%"
-      });
-    }, 1200);
-    
-    // Bileşen ekrandan gidince sayacı temizle (Memory leak önlemek için)
-    return () => clearInterval(interval);
-  }, [data]);
-
-  const handleClick = (isAi) => {
-    if (isAi) {
-      setScore(prev => prev + 10);
-    } else {
-      setScore(prev => prev - 5);
+    if (lives <= 0) {
+      saveAndExit(stats.correct);
+      return;
     }
-    setTarget(null); // Vurulunca ekrandan kaybolsun
+
+    const timer = setInterval(() => {
+      const random = data[Math.floor(Math.random() * data.length)];
+      setTarget({ 
+        ...random, 
+        top: Math.random() * 70 + "%", 
+        left: Math.random() * 80 + "%" 
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [lives]);
+
+  const shoot = (isAi) => {
+    if (lives <= 0) return;
+    if (isAi) {
+      setStats(p => ({ ...p, correct: p.correct + 1 }));
+    } else {
+      setStats(p => ({ ...p, wrong: p.wrong + 1 }));
+      setLives(l => l - 1);
+    }
+    setTarget(null);
   };
 
   return (
-    <div style={{ 
-      height: '450px', 
-      position: 'relative', 
-      overflow: 'hidden', 
-      border: '2px dashed #ccc', 
-      borderRadius: '15px', 
-      backgroundColor: '#f9f9f9',
-      marginTop: '20px'
-    }}>
-      <div style={{
-        padding: '10px', 
-        backgroundColor: 'rgba(0,0,0,0.1)', 
-        display: 'inline-block', 
-        borderRadius: '0 0 10px 0',
-        fontWeight: 'bold'
-      }}>
-        Skor: {score} (Sadece AI olanları vur!)
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ padding: '10px', fontSize: '1.5rem' }}>
+        Can: <span style={{ color: 'red' }}>{"❤️".repeat(lives)}</span> | 
+        Skor: <span style={{ color: 'green' }}>{stats.correct * 10}</span>
       </div>
-      
-      {target && (
-        <img 
-          src={target.url} 
-          alt="target"
-          onMouseDown={() => handleClick(target.isAi)} // Tıklamayı yakala
-          style={{
-            position: 'absolute',
-            top: target.top,
-            left: target.left,
-            width: '100px',
-            height: '100px',
-            objectFit: 'cover',
-            cursor: 'crosshair',
-            borderRadius: '50%',
-            border: target.isAi ? '3px solid transparent' : '3px solid transparent', 
-            boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-            userSelect: 'none',
-            transition: 'transform 0.1s active'
-          }}
-          draggable="false"
-        />
-      )}
+      <div style={{ 
+        height: '500px', position: 'relative', border: '3px solid #333', 
+        background: '#e0e0e0', overflow: 'hidden', borderRadius: '20px'
+      }}>
+        {lives > 0 && target && (
+          <img 
+            src={target.url} 
+            onMouseDown={() => shoot(target.isAi)} 
+            style={{ 
+              position: 'absolute', top: target.top, left: target.left, 
+              width: '100px', height: '100px', borderRadius: '50%', border: '3px solid white' 
+            }} 
+            alt="Hedef" 
+          />
+        )}
+      </div>
     </div>
   );
 };
-
 
 export default ShootGame;

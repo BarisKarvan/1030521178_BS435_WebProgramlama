@@ -1,0 +1,16 @@
+[
+  {
+    "username": "aaa",
+    "score": 45,
+    "details": "Doğru: 5 Yanlış: 1",
+    "mode": "CLASSIC",
+    "date": "2025-12-30T20:57:34.359Z"
+  },
+  {
+    "username": "aaa",
+    "score": 20,
+    "details": "Vurulan AI: 2",
+    "mode": "SHOOTER",
+    "date": "2025-12-30T20:58:02.879Z"
+  }
+]
